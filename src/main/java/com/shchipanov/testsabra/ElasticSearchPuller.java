@@ -17,14 +17,18 @@ import java.util.List;
 public class ElasticSearchPuller {
 
     public void pullData(List<GoogleSearchResultItem> data) {
-        Client client = new PreBuiltTransportClient(
-                Settings.builder().put("client.transport.sniff", true)
-                        .put("cluster.name","elasticsearch").build())
-                .addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+        try {
+            Client client = new PreBuiltTransportClient(
+                    Settings.builder().put("client.transport.sniff", true)
+                            .put("cluster.name", "elasticsearch").build())
+                    .addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
 
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
+            BulkRequestBuilder bulkRequest = client.prepareBulk();
 
-        bulkRequest.add(new IndexRequest("results").id("1")
-                .source(XContentType.values(), data));
+            bulkRequest.add(new IndexRequest("results").id("1")
+                    .source(XContentType.values(), data));
+        } catch(Exception e) {
+
+        }
     }
 }

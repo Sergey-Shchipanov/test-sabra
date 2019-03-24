@@ -1,5 +1,6 @@
 package com.shchipanov.testsabra;
 
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
@@ -14,6 +15,7 @@ import java.util.List;
 
 
 @Component
+@Slf4j
 public class ElasticSearchPuller {
 
     public void pullData(List<GoogleSearchResultItem> data) {
@@ -21,14 +23,14 @@ public class ElasticSearchPuller {
             Client client = new PreBuiltTransportClient(
                     Settings.builder().put("client.transport.sniff", true)
                             .put("cluster.name", "elasticsearch").build())
-                    .addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+                    .addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9200));
 
             BulkRequestBuilder bulkRequest = client.prepareBulk();
 
             bulkRequest.add(new IndexRequest("results").id("1")
                     .source(XContentType.values(), data));
         } catch(Exception e) {
-
+            log.error("Something goes wrong", e);
         }
     }
 }

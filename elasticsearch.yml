@@ -1,2 +1,14 @@
-cluster.name: "docker-cluster"
-network.host: 0.0.0.0
+cluster.name: test_cluster
+
+node.name: "test-node"
+
+node.master: true
+node.data: true
+
+index.number_of_shards: 5
+index.number_of_replicas: 1
+
+path.data: /usr/Elasticsearch/data
+
+http.cors.allow-origin: http://127.0.0.1
+http.cors.enabled: true

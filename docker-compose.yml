@@ -16,11 +16,11 @@ services:
         hard: -1
     ports:
       - "9200:9200"
-      - 9300:9300
+      - "9300:9300"
   kibana:
     image: docker.elastic.co/kibana/kibana:6.6.2
     environment:
       SERVER_NAME: localhost
-      ELASTICSEARCH_URL: http://localhost:9200/
+      ELASTICSEARCH_URL: http://elasticsearch:9200/
     ports:
       - "5601:5601"

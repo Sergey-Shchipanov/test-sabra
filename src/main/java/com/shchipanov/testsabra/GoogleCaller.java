@@ -15,8 +15,6 @@ public class GoogleCaller {
 
     public List<GoogleSearchResultItem> getSearchResultFromGoogle() {
 
-        List<GoogleSearchResultItem> results = new ArrayList<>();
-
         Client client = ClientBuilder.newClient();
         GoogleCustomSearchResult response = client.target("https://www.googleapis.com/customsearch/v1")
                 .queryParam("key", API_KEY)
@@ -26,7 +24,7 @@ public class GoogleCaller {
                 .request(MediaType.APPLICATION_JSON)
                 .get(GoogleCustomSearchResult.class);
 
-        results.addAll(response.getItems());
+        List<GoogleSearchResultItem> results = new ArrayList<>(response.getItems());
 
         for (int i = 1; i <= 3; i++) {
             results.addAll(client.target("https://www.googleapis.com/customsearch/v1")

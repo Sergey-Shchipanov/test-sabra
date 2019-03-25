@@ -1,17 +1,17 @@
 package com.shchipanov.testsabra;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.UUID;
 
 
 @Component
@@ -25,10 +25,16 @@ public class ElasticSearchPuller {
                             .put("cluster.name", "elasticsearch").build())
                     .addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9200));
 
-            BulkRequestBuilder bulkRequest = client.prepareBulk();
+            BulkRequest bulkRequest = new BulkRequest();
 
-            bulkRequest.add(new IndexRequest("results").id("1")
-                    .source(XContentType.values(), data));
+            data.forEach(res -> bulkRequest.add(
+                    new IndexRequest("results").id(String.valueOf(UUID.randomUUID()))
+                        .source("title", res.getTitle())
+                        .source("link", res.getLink())
+                        .source("cacheId", res.getCacheId())
+                        .source("displayLink", res.getDisplayLink())));
+
+            client.bulk(bulkRequest);
         } catch(Exception e) {
             log.error("Something goes wrong", e);
         }

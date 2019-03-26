@@ -5,7 +5,7 @@ services:
     links:
       - elasticsearch
     environment:
-      JAVA_OPTIONS: "-Xmx2g -Dsabra.elastic.ip=localhost -Dsabra.elastic.port=9200"
+      JAVA_OPTIONS: "-Xmx2g -Dsabra.elastic.ip=\"localhost\" -Dsabra.elastic.port=\"9200\""
     depends_on:
       - elasticsearch
   elasticsearch:

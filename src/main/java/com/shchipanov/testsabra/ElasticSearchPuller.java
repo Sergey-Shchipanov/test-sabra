@@ -19,6 +19,8 @@ import java.util.UUID;
 public class ElasticSearchPuller {
 
     public void pullData(List<GoogleSearchResultItem> data) {
+        System.out.println(System.getProperty("sabra.elastic.port"));
+        System.out.println(System.getProperty("sabra.elastic.ip"));
         try {
             Client client = new PreBuiltTransportClient(
                     Settings.builder().put("client.transport.sniff", true)

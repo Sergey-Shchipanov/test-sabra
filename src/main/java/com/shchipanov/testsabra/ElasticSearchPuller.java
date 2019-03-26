@@ -23,8 +23,8 @@ public class ElasticSearchPuller {
             Client client = new PreBuiltTransportClient(
                     Settings.builder().put("client.transport.sniff", true)
                             .put("cluster.name", "elasticsearch").build())
-                    .addTransportAddress(new TransportAddress(InetAddress.getByName(System.getProperty("sabra.elastic.cluster.ip")),
-                            Integer.parseInt(System.getProperty("sabra.elastic.cluster.por"))));
+                    .addTransportAddress(new TransportAddress(InetAddress.getByName(System.getProperty("sabra.elastic.ip")),
+                            Integer.parseInt(System.getProperty("sabra.elastic.port"))));
 
             BulkRequest bulkRequest = new BulkRequest();
 

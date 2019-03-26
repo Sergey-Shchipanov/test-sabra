@@ -23,19 +23,20 @@ public class ElasticSearchPuller {
             Client client = new PreBuiltTransportClient(
                     Settings.builder().put("client.transport.sniff", true)
                             .put("cluster.name", "elasticsearch").build())
-                    .addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9200));
+                    .addTransportAddress(new TransportAddress(InetAddress.getByName(System.getProperty("sabra.elastic.cluster.ip")),
+                            Integer.parseInt(System.getProperty("sabra.elastic.cluster.por"))));
 
             BulkRequest bulkRequest = new BulkRequest();
 
             data.forEach(res -> bulkRequest.add(
                     new IndexRequest("results").id(String.valueOf(UUID.randomUUID()))
-                        .source("title", res.getTitle())
-                        .source("link", res.getLink())
-                        .source("cacheId", res.getCacheId())
-                        .source("displayLink", res.getDisplayLink())));
+                            .source("title", res.getTitle())
+                            .source("link", res.getLink())
+                            .source("cacheId", res.getCacheId())
+                            .source("displayLink", res.getDisplayLink())));
 
             client.bulk(bulkRequest);
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("Something goes wrong", e);
         }
     }

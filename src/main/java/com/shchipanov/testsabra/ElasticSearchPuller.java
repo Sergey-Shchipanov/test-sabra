@@ -2,9 +2,11 @@ package com.shchipanov.testsabra;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -16,8 +18,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 
 @Component
@@ -52,18 +57,41 @@ public class ElasticSearchPuller {
 
         BulkRequest bulkRequest = new BulkRequest();
 
-        data.forEach(res -> bulkRequest.add(
-                new IndexRequest("results").id(String.valueOf(UUID.randomUUID()))
-                        .source("title", res.getTitle())
-                        .source("link", res.getLink())
-                        .source("cacheId", res.getCacheId())
-                        .source("displayLink", res.getDisplayLink())));
 
-        client.bulk(bulkRequest);
+        prepareBulk(data, client, bulkRequest);
+
+        client.bulk(bulkRequest, new ActionListener<>() {
+            @Override
+            public void onResponse(BulkResponse bulkItemResponses) {
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                System.out.println(e);
+                throw new IllegalStateException(e);
+            }
+        });
+    }
+
+    private void prepareBulk(List<GoogleSearchResultItem> data, Client client, BulkRequest bulkRequest) throws IOException {
+        for (GoogleSearchResultItem res : data) {
+            bulkRequest.add(client.prepareIndex("results", "_doc", UUID.randomUUID().toString())
+                    .setSource(jsonBuilder()
+                            .startObject()
+                            .field("title", res.getTitle())
+                            .field("link", res.getLink())
+                            .field("cacheId", res.getCacheId())
+                            .field("displayLink", res.getDisplayLink())
+                            .field("date", new Date())
+                            .endObject()
+                    ).request()
+            );
+        }
     }
 
     private XContentBuilder prepareMapping() throws IOException {
-        XContentBuilder builder = XContentFactory.jsonBuilder();
+        XContentBuilder builder = jsonBuilder();
         builder.startObject();
         {
             builder.startObject("_doc");
@@ -97,6 +125,12 @@ public class ElasticSearchPuller {
                     builder.startObject("displayLink");
                     {
                         builder.field("type", "text");
+                    }
+                    builder.endObject();
+                    builder.startObject("date");
+                    {
+                        builder.field("type", "date");
+                        builder.field("format", "yyyy-MM-dd");
                     }
                     builder.endObject();
                 }

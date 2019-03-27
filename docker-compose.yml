@@ -48,12 +48,12 @@ services:
         condition: service_healthy
     network_mode: bridge
 
-#  nginx:
-#    image: nginx:latest
-#    ports:
-#      - 8080:80
-#    volumes:
-#      - ${PWD}/nginx-config/:/etc/nginx/conf.d/
-#    command: /bin/bash -c "nginx -g 'daemon off;'"
-#    ulimits:
-#      nproc: 65535
+  nginx:
+    image: nginx:latest
+    ports:
+      - 8080:80
+    volumes:
+      - ${PWD}/nginx-config/:/etc/nginx/conf.d/
+    command: /bin/bash -c "nginx -g 'daemon off;'"
+    ulimits:
+      nproc: 65535

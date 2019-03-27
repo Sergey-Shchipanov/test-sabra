@@ -68,33 +68,37 @@ public class ElasticSearchPuller {
         {
             builder.startObject("_doc");
             {
-                builder.startObject("id");
+                builder.startObject("properties");
                 {
-                    builder.field("type", "text");
-                }
-                builder.endObject();
+                    builder.startObject("id");
+                    {
+                        builder.field("type", "text");
+                    }
+                    builder.endObject();
 
-                builder.startObject("title");
-                {
-                    builder.field("type", "text");
-                }
-                builder.endObject();
+                    builder.startObject("title");
+                    {
+                        builder.field("type", "text");
+                    }
+                    builder.endObject();
 
-                builder.startObject("link");
-                {
-                    builder.field("type", "text");
-                }
-                builder.endObject();
+                    builder.startObject("link");
+                    {
+                        builder.field("type", "text");
+                    }
+                    builder.endObject();
 
-                builder.startObject("cacheId");
-                {
-                    builder.field("type", "text");
-                }
-                builder.endObject();
+                    builder.startObject("cacheId");
+                    {
+                        builder.field("type", "text");
+                    }
+                    builder.endObject();
 
-                builder.startObject("displayLink");
-                {
-                    builder.field("type", "text");
+                    builder.startObject("displayLink");
+                    {
+                        builder.field("type", "text");
+                    }
+                    builder.endObject();
                 }
                 builder.endObject();
             }

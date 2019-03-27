@@ -52,23 +52,7 @@ public class ElasticSearchPuller {
             }
         });
 
-//        BulkRequest bulkRequest = new BulkRequest();
-
-
         pushToElastic(data, client);
-
-//        client.bulk(bulkRequest, new ActionListener<>() {
-//            @Override
-//            public void onResponse(BulkResponse bulkItemResponses) {
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                System.out.println(e);
-//                throw new IllegalStateException(e);
-//            }
-//        });
     }
 
     private void pushToElastic(List<GoogleSearchResultItem> data, Client client) throws IOException {

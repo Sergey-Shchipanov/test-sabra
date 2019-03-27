@@ -1,7 +1,9 @@
 package com.shchipanov.testsabra;
 
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
@@ -29,7 +31,6 @@ public class ElasticSearchPuller {
                         .build())
                 .addTransportAddress(new TransportAddress(InetAddress.getByName(System.getProperty("sabra.elastic.ip")), 9300));
 
-        IndicesAdminClient indicesAdminClient = client.admin().indices();
         CreateIndexRequest request = new CreateIndexRequest("results");
 
 
@@ -43,7 +44,17 @@ public class ElasticSearchPuller {
         jsonMap.put("_doc", mapping);
         request.mapping("_doc", jsonMap);
 
-        indicesAdminClient.create(request);
+        client.admin().indices().create(request, new ActionListener<>() {
+            @Override
+            public void onResponse(CreateIndexResponse createIndexResponse) {
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                throw new IllegalStateException("Can't create index");
+            }
+        });
 
         BulkRequest bulkRequest = new BulkRequest();
 

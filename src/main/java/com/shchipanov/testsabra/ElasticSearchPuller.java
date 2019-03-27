@@ -7,17 +7,16 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -25,7 +24,7 @@ import java.util.UUID;
 @Slf4j
 public class ElasticSearchPuller {
 
-    public void pullData(List<GoogleSearchResultItem> data) throws UnknownHostException {
+    public void pullData(List<GoogleSearchResultItem> data) throws IOException {
         Client client = new PreBuiltTransportClient(
                 Settings.builder().put("cluster.name", "docker-cluster")
                         .build())
@@ -34,15 +33,9 @@ public class ElasticSearchPuller {
         CreateIndexRequest request = new CreateIndexRequest("results");
 
 
-        Map<String, Object> jsonMap = new HashMap<>();
-        Map<String, Object> mapping = new HashMap<>();
-        mapping.put("id", "id");
-        mapping.put("title", "title");
-        mapping.put("link", "link");
-        mapping.put("cacheId", "cacheId");
-        mapping.put("displayLink", "displayLink");
-        jsonMap.put("_doc", mapping);
-        request.mapping("_doc", jsonMap);
+        XContentBuilder builder = prepareMapping();
+
+        request.mapping("_doc", builder);
 
         client.admin().indices().create(request, new ActionListener<>() {
             @Override
@@ -67,5 +60,47 @@ public class ElasticSearchPuller {
                         .source("displayLink", res.getDisplayLink())));
 
         client.bulk(bulkRequest);
+    }
+
+    private XContentBuilder prepareMapping() throws IOException {
+        XContentBuilder builder = XContentFactory.jsonBuilder();
+        builder.startObject();
+        {
+            builder.startObject("_doc");
+            {
+                builder.startObject("id");
+                {
+                    builder.field("type", "text");
+                }
+                builder.endObject();
+
+                builder.startObject("title");
+                {
+                    builder.field("type", "text");
+                }
+                builder.endObject();
+
+                builder.startObject("link");
+                {
+                    builder.field("type", "text");
+                }
+                builder.endObject();
+
+                builder.startObject("cacheId");
+                {
+                    builder.field("type", "text");
+                }
+                builder.endObject();
+
+                builder.startObject("displayLink");
+                {
+                    builder.field("type", "text");
+                }
+                builder.endObject();
+            }
+            builder.endObject();
+        }
+        builder.endObject();
+        return builder;
     }
 }

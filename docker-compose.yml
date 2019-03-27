@@ -1,11 +1,12 @@
-version: '3'
+version: '2.1'
 services:
   app:
     build: .
     links:
       - elasticsearch
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     network_mode: bridge
     restart: on-failure
 
@@ -41,7 +42,8 @@ services:
     links:
       - elasticsearch
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     network_mode: bridge
 
 #  nginx:

@@ -80,7 +80,6 @@ public class ElasticSearchPuller {
                             .field("link", res.getLink())
                             .field("cacheId", res.getCacheId())
                             .field("displayLink", res.getDisplayLink())
-                            .field("date", new Date())
                             .endObject()
                     ).request();
 
@@ -134,12 +133,6 @@ public class ElasticSearchPuller {
                     builder.startObject("displayLink");
                     {
                         builder.field("type", "text");
-                    }
-                    builder.endObject();
-                    builder.startObject("date");
-                    {
-                        builder.field("type", "date");
-                        builder.field("format", "yyyy-MM-dd");
                     }
                     builder.endObject();
                 }

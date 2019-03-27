@@ -10,6 +10,7 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,10 +19,7 @@ import java.util.UUID;
 @Slf4j
 public class ElasticSearchPuller {
 
-    public void pullData(List<GoogleSearchResultItem> data) {
-        System.out.println(System.getProperty("sabra.elastic.port"));
-        System.out.println(System.getProperty("sabra.elastic.ip"));
-        try {
+    public void pullData(List<GoogleSearchResultItem> data) throws UnknownHostException {
             Client client = new PreBuiltTransportClient(
                     Settings.builder().put("client.transport.sniff", true)
                             .put("cluster.name", "elasticsearch").build())
@@ -38,8 +36,5 @@ public class ElasticSearchPuller {
                             .source("displayLink", res.getDisplayLink())));
 
             client.bulk(bulkRequest);
-        } catch (Exception e) {
-            log.error("Something goes wrong", e);
-        }
     }
 }

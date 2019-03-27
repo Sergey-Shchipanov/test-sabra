@@ -52,6 +52,7 @@ public class ElasticSearchPuller {
 
             @Override
             public void onFailure(Exception e) {
+                System.out.println(e);
                 throw new IllegalStateException("Can't create index");
             }
         });

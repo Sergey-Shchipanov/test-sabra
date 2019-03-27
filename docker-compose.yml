@@ -5,7 +5,8 @@ services:
     links:
       - elasticsearch
     depends_on:
-      - elasticsearch
+      - elasticsearch:
+          condition: service_healthy
     network_mode: bridge
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.2
@@ -13,6 +14,7 @@ services:
     environment:
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
     ulimits:
       memlock:
         soft: -1
@@ -21,6 +23,11 @@ services:
       - "9200:9200"
       - "9300:9300"
     network_mode: bridge
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://elasticsearch:9200/_nodes?pretty=true"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   kibana:
     image: docker.elastic.co/kibana/kibana:6.6.2
     container_name: kibana
@@ -30,11 +37,11 @@ services:
     ports:
       - "5601:5601"
     links:
-      - elasticsearch
+      - elasticsearch:
+          condition: service_healthy
     depends_on:
       - elasticsearch
     network_mode: bridge
-#      - nginx
 #  nginx:
 #    image: nginx:latest
 #    ports:

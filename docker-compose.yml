@@ -5,9 +5,10 @@ services:
     links:
       - elasticsearch
     depends_on:
-      elasticsearch:
-        condition: service_healthy
+      - elasticsearch
     network_mode: bridge
+    restart_policy:
+      condition: on-failure
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.2
@@ -41,8 +42,7 @@ services:
     links:
       - elasticsearch
     depends_on:
-      elasticsearch:
-        condition: service_healthy
+      - elasticsearch
     network_mode: bridge
 
 #  nginx:

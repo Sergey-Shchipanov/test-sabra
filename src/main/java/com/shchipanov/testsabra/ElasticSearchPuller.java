@@ -20,7 +20,9 @@ import java.util.UUID;
 public class ElasticSearchPuller {
 
     public void pullData(List<GoogleSearchResultItem> data) throws UnknownHostException {
-            Client client = new PreBuiltTransportClient(Settings.EMPTY)
+            Client client = new PreBuiltTransportClient(
+                    Settings.builder().put("cluster.name", "docker-cluster")
+                            .build())
                     .addTransportAddress(new TransportAddress(InetAddress.getByName(System.getProperty("sabra.elastic.ip")), 9300));
 
             BulkRequest bulkRequest = new BulkRequest();

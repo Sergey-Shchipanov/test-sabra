@@ -6,8 +6,7 @@ services:
       - elasticsearch
     depends_on:
       - elasticsearch
-    networks:
-      - bridge
+    network_mode: bridge
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.2
     container_name: elasticsearch
@@ -21,8 +20,7 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-    networks:
-      - bridge
+    network_mode: bridge
   kibana:
     image: docker.elastic.co/kibana/kibana:6.6.2
     container_name: kibana
@@ -35,8 +33,7 @@ services:
       - elasticsearch
     depends_on:
       - elasticsearch
-    networks:
-      - bridge
+    network_mode: bridge
 #      - nginx
 #  nginx:
 #    image: nginx:latest

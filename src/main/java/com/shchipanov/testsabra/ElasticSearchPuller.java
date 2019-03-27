@@ -2,17 +2,14 @@ package com.shchipanov.testsabra;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Component;
 
@@ -55,28 +52,28 @@ public class ElasticSearchPuller {
             }
         });
 
-        BulkRequest bulkRequest = new BulkRequest();
+//        BulkRequest bulkRequest = new BulkRequest();
 
 
-        prepareBulk(data, client, bulkRequest);
+        pushToElastic(data, client);
 
-        client.bulk(bulkRequest, new ActionListener<>() {
-            @Override
-            public void onResponse(BulkResponse bulkItemResponses) {
-
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                System.out.println(e);
-                throw new IllegalStateException(e);
-            }
-        });
+//        client.bulk(bulkRequest, new ActionListener<>() {
+//            @Override
+//            public void onResponse(BulkResponse bulkItemResponses) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Exception e) {
+//                System.out.println(e);
+//                throw new IllegalStateException(e);
+//            }
+//        });
     }
 
-    private void prepareBulk(List<GoogleSearchResultItem> data, Client client, BulkRequest bulkRequest) throws IOException {
+    private void pushToElastic(List<GoogleSearchResultItem> data, Client client) throws IOException {
         for (GoogleSearchResultItem res : data) {
-            bulkRequest.add(client.prepareIndex("results", "_doc", UUID.randomUUID().toString())
+            IndexRequest request = client.prepareIndex("results", "_doc", UUID.randomUUID().toString())
                     .setSource(jsonBuilder()
                             .startObject()
                             .field("title", res.getTitle())
@@ -85,8 +82,20 @@ public class ElasticSearchPuller {
                             .field("displayLink", res.getDisplayLink())
                             .field("date", new Date())
                             .endObject()
-                    ).request()
-            );
+                    ).request();
+
+            client.index(request, new ActionListener<>() {
+                @Override
+                public void onResponse(IndexResponse indexResponse) {
+
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    System.out.println(e);
+                    throw new IllegalStateException(e);
+                }
+            });
         }
     }
 

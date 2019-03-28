@@ -31,3 +31,13 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+task myBuild {
+    dependsOn build, jar
+    copy {
+        from('build/libs') {
+            exclude '*.txt'
+        }
+        into '/'
+    }
+}

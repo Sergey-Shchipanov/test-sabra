@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +23,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 @Component
 @Slf4j
-public class ElasticSearchPuller {
+public class ElasticsearchSender {
 
     public void pullData(List<GoogleSearchResultItem> data) throws IOException {
         Client client = new PreBuiltTransportClient(
@@ -42,12 +41,10 @@ public class ElasticSearchPuller {
         client.admin().indices().create(request, new ActionListener<>() {
             @Override
             public void onResponse(CreateIndexResponse createIndexResponse) {
-
             }
 
             @Override
             public void onFailure(Exception e) {
-                System.out.println(e);
                 throw new IllegalStateException("Can't create index");
             }
         });
@@ -70,12 +67,10 @@ public class ElasticSearchPuller {
             client.index(request, new ActionListener<>() {
                 @Override
                 public void onResponse(IndexResponse indexResponse) {
-
                 }
 
                 @Override
                 public void onFailure(Exception e) {
-                    System.out.println(e);
                     throw new IllegalStateException(e);
                 }
             });

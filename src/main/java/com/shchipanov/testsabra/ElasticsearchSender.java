@@ -60,7 +60,7 @@ public class ElasticsearchSender {
 
             @Override
             public void onFailure(Exception e) {
-                throw new IllegalStateException("Can't create index");
+                throw new IllegalStateException(e);
             }
         });
     }

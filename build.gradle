@@ -35,9 +35,8 @@ dependencies {
 task myBuild {
     dependsOn build, jar
     copy {
-        from('build/libs') {
-            exclude '*.txt'
+        from('./build/libs') {
         }
-        into '/'
+        into './'
     }
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -25,12 +27,25 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 @Slf4j
 public class ElasticsearchSender {
 
-    public void pullData(List<GoogleSearchResultItem> data) throws IOException {
+    public void pullData(List<GoogleSearchResultItem> data) throws IOException, ExecutionException, InterruptedException {
         Client client = new PreBuiltTransportClient(
                 Settings.builder().put("cluster.name", "docker-cluster")
                         .build())
                 .addTransportAddress(new TransportAddress(InetAddress.getByName(System.getProperty("sabra.elastic.ip")), 9300));
 
+        var checkIndex = client.admin().indices().exists(new IndicesExistsRequest("results"));
+
+        if (checkIndex.isDone()) {
+            var result = checkIndex.get();
+            if ( !result.isExists() ) {
+                createIndexInElastic(client);
+            }
+        }
+
+        pushToElastic(data, client);
+    }
+
+    private void createIndexInElastic(Client client) throws IOException {
         CreateIndexRequest request = new CreateIndexRequest("results");
 
 
@@ -48,8 +63,6 @@ public class ElasticsearchSender {
                 throw new IllegalStateException("Can't create index");
             }
         });
-
-        pushToElastic(data, client);
     }
 
     private void pushToElastic(List<GoogleSearchResultItem> data, Client client) throws IOException {

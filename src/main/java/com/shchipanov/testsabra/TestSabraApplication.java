@@ -5,11 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 @SpringBootApplication
 public class TestSabraApplication {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         ConfigurableApplicationContext context = SpringApplication.run(TestSabraApplication.class, args);
 
         System.setProperty("sabra.elastic.ip", args[0]);
